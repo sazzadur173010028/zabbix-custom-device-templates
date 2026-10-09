@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+  <version>7.4</version>
+  <template_groups>
+    <template_group>
+      <uuid>bd122165ed754292977c6a02ae83b229</uuid>
+      <name>Templates/Printers</name>
+    </template_group>
+  </template_groups>
+  <templates>
+    <template>
+      <uuid>b4d9fbe6e2e14a02869b86c94d9ad26b</uuid>
+      <template>Template Brother DCP-B7640DW SNMP</template>
+      <name>Template Brother DCP-B7640DW SNMP</name>
+      <groups>
+        <group>
+          <name>Templates/Printers</name>
+        </group>
+      </groups>
+      <items>
+        <item>
+          <uuid>31d6bac7d4b44f51ba167a18842cfa7c</uuid>
+          <name>Printer Description</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.1.1.0</snmp_oid>
+          <key>printer.model</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>TEXT</value_type>
+          <description>System description (sysDescr).</description>
+        </item>
+        <item>
+          <uuid>db719040b0294bd7a6bcb462957b17f2</uuid>
+          <name>Printer Name</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.43.5.1.1.16.1</snmp_oid>
+          <key>printer.name</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+          <description>prtGeneralPrinterName.</description>
+        </item>
+        <item>
+          <uuid>523e97b7c37e4efaba7cec1431683ebc</uuid>
+          <name>Printer Serial</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.43.5.1.1.17.1</snmp_oid>
+          <key>printer.serial</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+          <description>prtGeneralSerialNumber.</description>
+        </item>
+        <item>
+          <uuid>e2ce66a4c5bb4e9bb5cc16d23bd8c038</uuid>
+          <name>Printer Location</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.1.6.0</snmp_oid>
+          <key>printer.location</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+          <description>SNMP system location.</description>
+        </item>
+        <item>
+          <uuid>4aefa4e01740432ca8ac6feb3c8a6970</uuid>
+          <name>Printer Uptime</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.1.3.0</snmp_oid>
+          <key>printer.uptime</key>
+          <delay>1m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>FLOAT</value_type>
+          <units>uptime</units>
+          <description>SNMP sysUpTime (timeticks converted to seconds).</description>
+          <preprocessing>
+            <step>
+              <type>MULTIPLIER</type>
+              <parameters>
+                <parameter>0.01</parameter>
+              </parameters>
+            </step>
+          </preprocessing>
+        </item>
+        <item>
+          <uuid>ba7c82fb3dba4ac9b1d67eb154da6f8e</uuid>
+          <name>Printer Status</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.25.3.5.1.1.1</snmp_oid>
+          <key>printer.status</key>
+          <delay>1m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <description>hrPrinterStatus: 1 other, 2 unknown, 3 idle, 4 printing, 5 warmup.</description>
+        </item>
+        <item>
+          <uuid>b5ed12e95a1f4a4fb90a6c7d0ad488d7</uuid>
+          <name>Printer Error State</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.25.3.5.1.2.1</snmp_oid>
+          <key>printer.error.state</key>
+          <delay>1m</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+          <description>hrPrinterDetectedErrorState decoded to text flags (empty = no error).</description>
+          <preprocessing>
+            <step>
+              <type>JAVASCRIPT</type>
+              <parameters>
+                <parameter>var h = value.replace(/[^0-9a-fA-F]/g, '');
+if (h.length &lt; 2) { return ''; }
+var b1 = parseInt(h.substr(0, 2), 16);
+var b2 = (h.length &gt;= 4) ? parseInt(h.substr(2, 2), 16) : 0;
+var f = [];
+if (b1 &amp; 0x80) f.push('lowPaper');
+if (b1 &amp; 0x40) f.push('noPaper');
+if (b1 &amp; 0x20) f.push('lowToner');
+if (b1 &amp; 0x10) f.push('noToner');
+if (b1 &amp; 0x08) f.push('doorOpen');
+if (b1 &amp; 0x04) f.push('jammed');
+if (b1 &amp; 0x02) f.push('offline');
+if (b1 &amp; 0x01) f.push('serviceRequested');
+if (b2 &amp; 0x80) f.push('inputTrayMissing');
+if (b2 &amp; 0x40) f.push('outputTrayMissing');
+if (b2 &amp; 0x20) f.push('markerSupplyMissing');
+if (b2 &amp; 0x10) f.push('outputNearFull');
+if (b2 &amp; 0x08) f.push('outputFull');
+if (b2 &amp; 0x04) f.push('inputTrayEmpty');
+if (b2 &amp; 0x02) f.push('overduePreventMaintenance');
+return f.join(', ');</parameter>
+              </parameters>
+            </step>
+          </preprocessing>
+        </item>
+        <item>
+          <uuid>32048c66e67c442bac49d251ff85cec6</uuid>
+          <name>Printer Display Message</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.43.16.5.1.2.1.1</snmp_oid>
+          <key>printer.display</key>
+          <delay>1m</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+          <description>Text currently shown on the printer LCD (prtConsoleDisplayBufferText).</description>
+        </item>
+        <item>
+          <uuid>22a4a12d249f45aa9f59cb0d9f353cca</uuid>
+          <name>Printer Cover Status</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.43.6.1.1.3.1.1</snmp_oid>
+          <key>printer.cover.status</key>
+          <delay>1m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <description>prtCoverStatus: 3 open, 4 closed, 5 interlock open, 6 interlock closed.</description>
+        </item>
+        <item>
+          <uuid>01df361f9c2a42c18f163091a2cab37e</uuid>
+          <name>Lifetime Page Counter</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.43.10.2.1.4.1.1</snmp_oid>
+          <key>printer.pages.lifetime</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>pages</units>
+          <description>prtMarkerLifeCount.</description>
+        </item>
+        <item>
+          <uuid>e494577c71454b30b54a483709c57ede</uuid>
+          <name>Black Toner Description</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.43.11.1.1.6.1.1</snmp_oid>
+          <key>printer.toner.black.description</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+          <description>Supply 1 description.</description>
+        </item>
+        <item>
+          <uuid>7243a37ad48d4883b0c2794baba64a9f</uuid>
+          <name>Black Toner Level</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.43.11.1.1.9.1.1</snmp_oid>
+          <key>printer.toner.black.level</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>FLOAT</value_type>
+          <description>prtMarkerSuppliesLevel. This printer reports -3 (some remaining, amount unknown); 0 means empty.</description>
+        </item>
+        <item>
+          <uuid>373044465104494ea4ef66aa1e769aa9</uuid>
+          <name>Drum Unit Description</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.43.11.1.1.6.1.2</snmp_oid>
+          <key>printer.drum.description</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+          <description>Supply 2 description.</description>
+        </item>
+        <item>
+          <uuid>2950e7af05344204b71e33dcb3a6f618</uuid>
+          <name>Drum Unit Remaining</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.43.11.1.1.9.1.2</snmp_oid>
+          <key>printer.drum.level</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>FLOAT</value_type>
+          <units>pages</units>
+          <description>Drum unit remaining impressions.</description>
+        </item>
+        <item>
+          <uuid>3ce40feda55c4778885bc001146a0488</uuid>
+          <name>Drum Unit Capacity</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.43.11.1.1.8.1.2</snmp_oid>
+          <key>printer.drum.max</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>FLOAT</value_type>
+          <units>pages</units>
+          <description>Drum unit maximum impressions.</description>
+        </item>
+        <item>
+          <uuid>b75a97d95efe44b4a39f9b01747d5841</uuid>
+          <name>Drum Unit Remaining %</name>
+          <type>CALCULATED</type>
+          <key>printer.drum.percent</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>FLOAT</value_type>
+          <units>%</units>
+          <params>last(//printer.drum.level)/last(//printer.drum.max)*100</params>
+          <description>Drum unit remaining life in percent.</description>
+        </item>
+        <item>
+          <uuid>c191ecaa5cbc4c4783e7490480216d1f</uuid>
+          <name>ICMP Ping</name>
+          <type>SIMPLE</type>
+          <key>icmpping</key>
+          <delay>1m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <description>1 = reachable, 0 = not reachable (needs fping on the Zabbix server).</description>
+        </item>
+      </items>
+      <tags>
+        <tag><tag>class</tag><value>printer</value></tag>
+        <tag><tag>vendor</tag><value>Brother</value></tag>
+        <tag><tag>model</tag><value>DCP-B7640DW</value></tag>
+        <tag><tag>snmp_version</tag><value>v1</value></tag>
+      </tags>
+      <macros>
+        <macro>
+          <macro>{$SNMP_COMMUNITY}</macro>
+          <value>public</value>
+          <description>SNMP v1 community. Host er SNMP interface e community field e {$SNMP_COMMUNITY} deben.</description>
+        </macro>
+      </macros>
+    </template>
+  </templates>
+  <triggers>
+    <trigger>
+      <uuid>014cabced6c345a9adc8c4d8b7f8634f</uuid>
+      <expression>nodata(/Template Brother DCP-B7640DW SNMP/printer.uptime,5m)=1</expression>
+      <name>Brother DCP-B7640DW SNMP unavailable</name>
+      <priority>HIGH</priority>
+      <description>No SNMP response for 5 minutes.</description>
+      <manual_close>YES</manual_close>
+    </trigger>
+    <trigger>
+      <uuid>2d12e3e6e17e44cb9c563fc1d11be2bf</uuid>
+      <expression>max(/Template Brother DCP-B7640DW SNMP/icmpping,#3)=0</expression>
+      <name>Brother DCP-B7640DW not reachable by ping</name>
+      <priority>HIGH</priority>
+      <description>Last 3 ping checks failed.</description>
+      <manual_close>YES</manual_close>
+    </trigger>
+    <trigger>
+      <uuid>aca998382e624c569092b7ed5bff3a6b</uuid>
+      <expression>last(/Template Brother DCP-B7640DW SNMP/printer.cover.status)=3 or last(/Template Brother DCP-B7640DW SNMP/printer.cover.status)=5</expression>
+      <name>Brother DCP-B7640DW cover is open</name>
+      <priority>HIGH</priority>
+      <description>Printer cover/interlock is open.</description>
+      <manual_close>YES</manual_close>
+    </trigger>
+    <trigger>
+      <uuid>317712d1ffb84bf19bba03edf989e7e6</uuid>
+      <expression>length(last(/Template Brother DCP-B7640DW SNMP/printer.error.state))&gt;0</expression>
+      <name>Brother DCP-B7640DW reports: {{ITEM.LASTVALUE1}}</name>
+      <priority>WARNING</priority>
+      <description>Printer reports one or more error/alert flags.</description>
+      <manual_close>YES</manual_close>
+    </trigger>
+    <trigger>
+      <uuid>6f0617412dd64c3db5934de7a1374210</uuid>
+      <expression>last(/Template Brother DCP-B7640DW SNMP/printer.toner.black.level)=0</expression>
+      <name>Brother DCP-B7640DW black toner empty</name>
+      <priority>HIGH</priority>
+      <description>Toner level reported as 0 (empty).</description>
+      <manual_close>YES</manual_close>
+    </trigger>
+    <trigger>
+      <uuid>fec805461a014661b7f81784a8973e37</uuid>
+      <expression>last(/Template Brother DCP-B7640DW SNMP/printer.drum.percent)&lt;10 and last(/Template Brother DCP-B7640DW SNMP/printer.drum.percent)&gt;=5</expression>
+      <name>Brother DCP-B7640DW drum unit below 10%</name>
+      <priority>WARNING</priority>
+      <description>Drum unit remaining life is between 5% and 10%.</description>
+      <manual_close>YES</manual_close>
+    </trigger>
+    <trigger>
+      <uuid>f89bf1721e53475eb7e5650e2d975ddb</uuid>
+      <expression>last(/Template Brother DCP-B7640DW SNMP/printer.drum.percent)&lt;5</expression>
+      <name>Brother DCP-B7640DW drum unit critically low</name>
+      <priority>HIGH</priority>
+      <description>Drum unit remaining life is below 5%.</description>
+      <manual_close>YES</manual_close>
+    </trigger>
+    <trigger>
+      <uuid>b1a4230342b746fe95b011fa4b322abb</uuid>
+      <expression>change(/Template Brother DCP-B7640DW SNMP/printer.pages.lifetime)&lt;0</expression>
+      <name>Brother DCP-B7640DW lifetime counter decreased</name>
+      <priority>WARNING</priority>
+      <description>Lifetime counter decreased; check for replacement, reset or counter anomaly.</description>
+      <manual_close>YES</manual_close>
+    </trigger>
+    <trigger>
+      <uuid>bc4e39069cfe4885ab57863aaa65edf6</uuid>
+      <expression>change(/Template Brother DCP-B7640DW SNMP/printer.uptime)&lt;0</expression>
+      <name>Brother DCP-B7640DW reboot detected</name>
+      <priority>INFO</priority>
+      <description>sysUpTime decreased: reboot or SNMP agent restart.</description>
+      <manual_close>YES</manual_close>
+    </trigger>
+  </triggers>
+</zabbix_export>
