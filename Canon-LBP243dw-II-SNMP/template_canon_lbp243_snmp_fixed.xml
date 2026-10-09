@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+  <version>7.4</version>
+  <template_groups>
+    <template_group>
+      <uuid>0bd8466572484d9daf1b80b1d9a99e66</uuid>
+      <name>Templates/Printers</name>
+    </template_group>
+  </template_groups>
+  <templates>
+    <template>
+      <uuid>10db3a0a88f44e39a62f4555e9522fe4</uuid>
+      <template>Template Canon LBP242 II 243 II SNMP</template>
+      <name>Template Canon LBP242 II 243 II SNMP</name>
+      <groups>
+        <group>
+          <name>Templates/Printers</name>
+        </group>
+      </groups>
+      <items>
+        <item>
+          <uuid>1a2421255e1a40c7a15098ae6e0909db</uuid>
+          <name>Printer Model</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.1.1.0</snmp_oid>
+          <key>printer.model</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>TEXT</value_type>
+          <description>Printer model/system description.</description>
+        </item>
+        <item>
+          <uuid>46aa292c8d3b4cfcb2674567b3fa9250</uuid>
+          <name>Printer Serial</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.43.5.1.1.17.1</snmp_oid>
+          <key>printer.serial</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+          <description>Printer serial/identification string.</description>
+        </item>
+        <item>
+          <uuid>a654ea33334643759f4a070a4392aa37</uuid>
+          <name>Printer Location</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.1.6.0</snmp_oid>
+          <key>printer.location</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+          <description>SNMP system location.</description>
+        </item>
+        <item>
+          <uuid>e521b538bc1641d29c3a82396a5822b3</uuid>
+          <name>Printer Uptime</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.1.3.0</snmp_oid>
+          <key>printer.uptime</key>
+          <delay>1m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>FLOAT</value_type>
+          <units>uptime</units>
+          <description>SNMP sysUpTime (timeticks converted to seconds).</description>
+          <preprocessing>
+            <step>
+              <type>MULTIPLIER</type>
+              <parameters>
+                <parameter>0.01</parameter>
+              </parameters>
+            </step>
+          </preprocessing>
+        </item>
+        <item>
+          <uuid>30cfd208c84f4bf994a9bcbcc4f54b46</uuid>
+          <name>Printer Status</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.25.3.5.1.1.1</snmp_oid>
+          <key>printer.status</key>
+          <delay>1m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <description>Host Resources printer status enum.</description>
+        </item>
+        <item>
+          <uuid>e654afa042a640c38225eeab54c01476</uuid>
+          <name>Printer Error State</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.25.3.5.1.2.1</snmp_oid>
+          <key>printer.error.state</key>
+          <delay>1m</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+          <description>Host Resources printer error-state bitmap.</description>
+        </item>
+        <item>
+          <uuid>4aa01d4c8d9b434aa7a4bdb334458534</uuid>
+          <name>Ethernet Interface Operational Status</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.2.2.1.8.1</snmp_oid>
+          <key>net.if.status[1]</key>
+          <delay>1m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <description>ifOperStatus for interface index 1.</description>
+        </item>
+        <item>
+          <uuid>8761ff79c2b14bde860871455e3a0ab5</uuid>
+          <name>Ethernet Interface Speed</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.2.2.1.5.1</snmp_oid>
+          <key>net.if.speed[1]</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>bps</units>
+          <description>ifSpeed for interface index 1.</description>
+        </item>
+        <item>
+          <uuid>4252bde548234baca0b50084697460f5</uuid>
+          <name>Ethernet Incoming Traffic</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.2.2.1.10.1</snmp_oid>
+          <key>net.if.in[1]</key>
+          <delay>1m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>Bps</units>
+          <description>Incoming octets; stored as change per second.</description>
+          <preprocessing>
+            <step>
+              <type>CHANGE_PER_SECOND</type>
+              <parameters>
+                <parameter></parameter>
+              </parameters>
+            </step>
+          </preprocessing>
+        </item>
+        <item>
+          <uuid>7a8ce85e65904d6da737f899d105fd99</uuid>
+          <name>Ethernet Outgoing Traffic</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.2.2.1.16.1</snmp_oid>
+          <key>net.if.out[1]</key>
+          <delay>1m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>Bps</units>
+          <description>Outgoing octets; stored as change per second.</description>
+          <preprocessing>
+            <step>
+              <type>CHANGE_PER_SECOND</type>
+              <parameters>
+                <parameter></parameter>
+              </parameters>
+            </step>
+          </preprocessing>
+        </item>
+        <item>
+          <uuid>f92cb94bcd26437caad7c2eb17769c16</uuid>
+          <name>Ethernet Incoming Errors</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.2.2.1.14.1</snmp_oid>
+          <key>net.if.in.errors[1]</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <description>ifInErrors cumulative counter.</description>
+        </item>
+        <item>
+          <uuid>3d50972bbe3747b99a6f9696ffe2e1a7</uuid>
+          <name>Ethernet Incoming Discards</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.2.2.1.13.1</snmp_oid>
+          <key>net.if.in.discards[1]</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <description>ifInDiscards cumulative counter.</description>
+        </item>
+        <item>
+          <uuid>c57c3acaf50a4f45a021812540a799d3</uuid>
+          <name>Black Toner Level</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.43.11.1.1.9.1.1</snmp_oid>
+          <key>printer.toner.black.level</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>%</units>
+          <description>Canon Cartridge 070 Black Toner; Printer-MIB supply level.</description>
+        </item>
+        <item>
+          <uuid>d47e32e971bd4515b720d48c08c9e88e</uuid>
+          <name>Black Toner Description</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.43.11.1.1.6.1.1</snmp_oid>
+          <key>printer.toner.black.description</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+          <description>Supply description.</description>
+        </item>
+        <item>
+          <uuid>3b27cd597b754c9da45fc74695457eaf</uuid>
+          <name>Lifetime Page Counter</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.43.10.2.1.4.1.1</snmp_oid>
+          <key>printer.pages.lifetime</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>pages</units>
+          <description>Standard Printer-MIB prtMarkerLifeCount.</description>
+        </item>
+        <item>
+          <uuid>fb368c06bd794c6d9ee690adfa4f9565</uuid>
+          <name>Canon Counter - Total 1</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.11.2.1.1.3.1</snmp_oid>
+          <key>printer.canon.total1</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>pages</units>
+          <description>Canon private counter Total 1.</description>
+        </item>
+        <item>
+          <uuid>30e38457dddd486ea76497ad7fa10baf</uuid>
+          <name>Canon Counter - Total 2</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.11.2.1.1.3.2</snmp_oid>
+          <key>printer.canon.total2</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>pages</units>
+          <description>Canon private counter Total 2.</description>
+        </item>
+        <item>
+          <uuid>340d2f384b4849e38f502d9317f3d035</uuid>
+          <name>Canon Counter - Print Total 1</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.11.2.1.1.3.25</snmp_oid>
+          <key>printer.canon.print.total1</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>pages</units>
+          <description>Canon private counter Print (Total 1).</description>
+        </item>
+        <item>
+          <uuid>5262fb54fef048f184a2c4f548936bbd</uuid>
+          <name>Canon Counter - Total 1 (2-Sided)</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.11.2.1.1.3.10</snmp_oid>
+          <key>printer.canon.total1.2sided</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>pages</units>
+          <description>Canon private counter Total 1 (2-Sided).</description>
+        </item>
+        <item>
+          <uuid>a694ded1b97b4592bdb937f7dbcb9444</uuid>
+          <name>Canon Counter - Copy Total 1</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.11.2.1.1.3.17</snmp_oid>
+          <key>printer.canon.copy.total1</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>pages</units>
+          <description>Canon private counter Copy (Total 1).</description>
+        </item>
+        <item>
+          <uuid>8211bb831c3544e99b8353221ca4208e</uuid>
+          <name>Canon Counter - Scan Total 1</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.11.2.1.1.3.31</snmp_oid>
+          <key>printer.canon.scan.total1</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>pages</units>
+          <description>Canon private counter Scan (Total 1).</description>
+        </item>
+        <item>
+          <uuid>d7516716d0a647aeac0a3165db767dc8</uuid>
+          <name>Canon Counter - Receive Print Total 1</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.11.2.1.1.3.32</snmp_oid>
+          <key>printer.canon.receiveprint.total1</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>pages</units>
+          <description>Canon private counter Receive Print (Total 1).</description>
+        </item>
+        <item>
+          <uuid>57e70d95cdb949d19990c6177fcf63cf</uuid>
+          <name>Firmware - MAIN_ROM</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.4.7.1.1.4.1</snmp_oid>
+          <key>printer.firmware.main</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+          <description>Canon MAIN_ROM firmware version.</description>
+        </item>
+        <item>
+          <uuid>a85b60d8b20c44db804870575dba7810</uuid>
+          <name>Firmware - BOOT_ROM</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.4.7.1.1.4.2</snmp_oid>
+          <key>printer.firmware.boot</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+          <description>Canon BOOT_ROM firmware version.</description>
+        </item>
+        <item>
+          <uuid>3a9b41c443894dabba10fdff31d12712</uuid>
+          <name>Firmware - ECONT</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.4.7.1.1.4.3</snmp_oid>
+          <key>printer.firmware.econt</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+          <description>Canon ECONT firmware version.</description>
+        </item>
+      </items>
+      <tags>
+        <tag><tag>class</tag><value>printer</value></tag>
+        <tag><tag>vendor</tag><value>Canon</value></tag>
+        <tag><tag>model</tag><value>LBP242 II/243 II</value></tag>
+        <tag><tag>snmp_version</tag><value>v1</value></tag>
+      </tags>
+      <macros>
+        <macro>
+          <macro>{$SNMP_COMMUNITY}</macro>
+          <value>public</value>
+          <description>SNMP v1 community. Host er SNMP interface e community field e {$SNMP_COMMUNITY} deben.</description>
+        </macro>
+      </macros>
+    </template>
+  </templates>
+  <triggers>
+    <trigger>
+      <uuid>26f5064626214d8e852af09e520a562f</uuid>
+      <expression>nodata(/Template Canon LBP242 II 243 II SNMP/printer.uptime,5m)=1</expression>
+      <name>Printer SNMP monitoring unavailable</name>
+      <priority>HIGH</priority>
+      <description>No SNMP response from the printer for 5 minutes.</description>
+      <manual_close>YES</manual_close>
+    </trigger>
+    <trigger>
+      <uuid>9be7046d3d544f778a14fa35ccaf18e0</uuid>
+      <expression>last(/Template Canon LBP242 II 243 II SNMP/net.if.status[1])&lt;&gt;1</expression>
+      <name>Printer Ethernet link is down</name>
+      <priority>HIGH</priority>
+      <description>FastEthernet interface index 1 is not operational.</description>
+      <manual_close>YES</manual_close>
+    </trigger>
+    <trigger>
+      <uuid>1ce6cb7361a14c96a1c012123168de2b</uuid>
+      <expression>last(/Template Canon LBP242 II 243 II SNMP/printer.toner.black.level)&lt;20 and last(/Template Canon LBP242 II 243 II SNMP/printer.toner.black.level)&gt;=10</expression>
+      <name>Printer black toner below 20%</name>
+      <priority>WARNING</priority>
+      <description>Black toner level is between 10% and 20%.</description>
+      <manual_close>YES</manual_close>
+    </trigger>
+    <trigger>
+      <uuid>72bc455d93434fb88d3291e629f8c47a</uuid>
+      <expression>last(/Template Canon LBP242 II 243 II SNMP/printer.toner.black.level)&lt;10</expression>
+      <name>Printer black toner critically low</name>
+      <priority>HIGH</priority>
+      <description>Black toner level is below 10%.</description>
+      <manual_close>YES</manual_close>
+    </trigger>
+    <trigger>
+      <uuid>02bf670c15b34f8aa5f7a0d0ce8a3415</uuid>
+      <expression>change(/Template Canon LBP242 II 243 II SNMP/printer.pages.lifetime)&lt;0</expression>
+      <name>Printer lifetime counter decreased</name>
+      <priority>WARNING</priority>
+      <description>Lifetime counter decreased; investigate printer replacement, reset, or counter anomaly.</description>
+      <manual_close>YES</manual_close>
+    </trigger>
+    <trigger>
+      <uuid>2dac54e6e4ca4b3d96ca26ea0efad21f</uuid>
+      <expression>change(/Template Canon LBP242 II 243 II SNMP/printer.uptime)&lt;0</expression>
+      <name>Printer reboot detected</name>
+      <priority>INFO</priority>
+      <description>SNMP sysUpTime decreased, indicating a reboot or SNMP agent restart.</description>
+      <manual_close>YES</manual_close>
+    </trigger>
+  </triggers>
+</zabbix_export>
