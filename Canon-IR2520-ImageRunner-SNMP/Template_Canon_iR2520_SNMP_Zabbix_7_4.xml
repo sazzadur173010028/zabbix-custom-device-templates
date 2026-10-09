@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+  <version>7.4</version>
+  <template_groups>
+    <template_group>
+      <uuid>d37584a91695413780a16b7e91be4ae0</uuid>
+      <name>Templates/Printers</name>
+    </template_group>
+  </template_groups>
+  <templates>
+    <template>
+      <uuid>9892058f53324df1a41bdcae09517d8a</uuid>
+      <template>Template Canon iR2520 SNMP</template>
+      <name>Template Canon iR2520 SNMP</name>
+      <groups>
+        <group>
+          <name>Templates/Printers</name>
+        </group>
+      </groups>
+      <items>
+        <item>
+          <uuid>11f6038d11e14c29b5c755df2d4328e3</uuid>
+          <name>Canon Model</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.1.1.1.0</snmp_oid>
+          <key>canon.model</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+        </item>
+        <item>
+          <uuid>0a526861addc4a0f9394d0507f632ff8</uuid>
+          <name>Canon Model Name</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.1.1.2.0</snmp_oid>
+          <key>canon.model.name</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+        </item>
+        <item>
+          <uuid>5dc89deb66124eee9a98ee5ada7bcf28</uuid>
+          <name>Canon Serial Number</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.2.1.4.0</snmp_oid>
+          <key>canon.serial</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+        </item>
+        <item>
+          <uuid>d07e860d5207460fa283b54e77686213</uuid>
+          <name>SNMP Contact</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.2.2.1.0</snmp_oid>
+          <key>canon.contact</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+        </item>
+        <item>
+          <uuid>09dab411b7e745859c7a8a929af19510</uuid>
+          <name>SNMP Location</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.2.2.3.0</snmp_oid>
+          <key>canon.location</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+        </item>
+        <item>
+          <uuid>2c4e13d0fc044387b22b8322e8527094</uuid>
+          <name>SNMP Uptime</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.1.3.0</snmp_oid>
+          <key>sys.uptime</key>
+          <delay>1m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>FLOAT</value_type>
+          <units>uptime</units>
+          <preprocessing>
+            <step>
+              <type>MULTIPLIER</type>
+              <parameters>
+                <parameter>0.01</parameter>
+              </parameters>
+            </step>
+          </preprocessing>
+        </item>
+        <item>
+          <uuid>fbc46315be184006a2ee7449503d987f</uuid>
+          <name>SNMP Name</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.1.5.0</snmp_oid>
+          <key>sys.name</key>
+          <delay>1h</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+        </item>
+        <item>
+          <uuid>c25a98d45d194d4b8313ccfcaa4b9346</uuid>
+          <name>Printer Error / Door State</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.25.3.5.1.2.1</snmp_oid>
+          <key>printer.error.state</key>
+          <delay>1m</delay>
+          <history>7d</history>
+          <trends>0</trends>
+          <value_type>CHAR</value_type>
+          <preprocessing>
+            <step>
+              <type>JAVASCRIPT</type>
+              <parameters>
+                <parameter>var h = value.replace(/[^0-9a-fA-F]/g, '');
+if (h.length &lt; 2) { return ''; }
+var b1 = parseInt(h.substr(0, 2), 16);
+var b2 = (h.length &gt;= 4) ? parseInt(h.substr(2, 2), 16) : 0;
+var f = [];
+if (b1 &amp; 0x80) f.push('lowPaper');
+if (b1 &amp; 0x40) f.push('noPaper');
+if (b1 &amp; 0x20) f.push('lowToner');
+if (b1 &amp; 0x10) f.push('noToner');
+if (b1 &amp; 0x08) f.push('doorOpen');
+if (b1 &amp; 0x04) f.push('jammed');
+if (b1 &amp; 0x02) f.push('offline');
+if (b1 &amp; 0x01) f.push('serviceRequested');
+if (b2 &amp; 0x80) f.push('inputTrayMissing');
+if (b2 &amp; 0x40) f.push('outputTrayMissing');
+if (b2 &amp; 0x20) f.push('markerSupplyMissing');
+if (b2 &amp; 0x10) f.push('outputNearFull');
+if (b2 &amp; 0x08) f.push('outputFull');
+if (b2 &amp; 0x04) f.push('inputTrayEmpty');
+if (b2 &amp; 0x02) f.push('overduePreventMaintenance');
+return f.join(', ');</parameter>
+              </parameters>
+            </step>
+          </preprocessing>
+        </item>
+        <item>
+          <uuid>54063957c2cf4e8387e9d64a475efeac</uuid>
+          <name>Printer Status</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.25.3.5.1.1.1</snmp_oid>
+          <key>printer.status</key>
+          <delay>1m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+        </item>
+        <item>
+          <uuid>6e3928331add40f888430ed3a8b1fb90</uuid>
+          <name>Canon Enterprise Status 1.12.1.0</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.12.1.0</snmp_oid>
+          <key>canon.status.1.12</key>
+          <delay>1m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+        </item>
+        <item>
+          <uuid>20c20b39a0e24ad4ba479141c9fc729b</uuid>
+          <name>Ethernet Speed</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.2.2.1.5.1</snmp_oid>
+          <key>if.speed[1]</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>bps</units>
+        </item>
+        <item>
+          <uuid>864de658218f478c8223e76a5eb0d5a7</uuid>
+          <name>Copy Total</name>
+          <type>CALCULATED</type>
+          <key>canon.counter.copy.total</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>pages</units>
+          <params>last(//canon.counter.copy.bw)+last(//canon.counter.copy.bw.small)</params>
+        </item>
+        <item>
+          <uuid>721d6573305b46da8019140579eee806</uuid>
+          <name>Copy B/W Large</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.11.1.3.1.4.112</snmp_oid>
+          <key>canon.counter.copy.bw</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>pages</units>
+        </item>
+        <item>
+          <uuid>5b9311505bc940ad88b894273fedff00</uuid>
+          <name>Copy B/W Small</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.11.1.3.1.4.113</snmp_oid>
+          <key>canon.counter.copy.bw.small</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>pages</units>
+        </item>
+        <item>
+          <uuid>29c8d8c204d5494aac2f7956679332af</uuid>
+          <name>Print Total</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.11.1.3.1.4.301</snmp_oid>
+          <key>canon.counter.print.total</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>pages</units>
+        </item>
+        <item>
+          <uuid>fd5c3fe42e8c4aa581706ca9bd2b33aa</uuid>
+          <name>Scan Total</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.4.1.1602.1.11.1.3.1.4.501</snmp_oid>
+          <key>canon.counter.scan.total</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>pages</units>
+        </item>
+        <item>
+          <uuid>31a4919dc4f7455e8473d58e36727af5</uuid>
+          <name>Lifetime Page Counter</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.43.10.2.1.4.1.1</snmp_oid>
+          <key>canon.pages.lifetime</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+          <units>pages</units>
+        </item>
+        <item>
+          <uuid>be4803a233774dc2bd07f209dd288713</uuid>
+          <name>Tray 1 Paper Level</name>
+          <type>SNMP_AGENT</type>
+          <snmp_oid>1.3.6.1.2.1.43.8.2.1.10.1.2</snmp_oid>
+          <key>canon.tray1.level</key>
+          <delay>5m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>FLOAT</value_type>
+        </item>
+
+        <item>
+          <uuid>6e1bc04c358d4a6b999ccddaa26dd107</uuid>
+          <name>ICMP Ping</name>
+          <type>SIMPLE</type>
+          <key>icmpping</key>
+          <delay>1m</delay>
+          <history>7d</history>
+          <trends>365d</trends>
+          <value_type>UNSIGNED</value_type>
+        </item>
+      </items>
+      <tags>
+        <tag><tag>class</tag><value>printer</value></tag>
+        <tag><tag>vendor</tag><value>Canon</value></tag>
+        <tag><tag>model</tag><value>iR2520</value></tag>
+        <tag><tag>snmp_version</tag><value>v1</value></tag>
+      </tags>
+      <macros>
+        <macro>
+          <macro>{$SNMP_COMMUNITY}</macro>
+          <value>public</value>
+          <description>SNMP v1 community. Host er SNMP interface e community field e {$SNMP_COMMUNITY} deben.</description>
+        </macro>
+      </macros>
+    </template>
+  </templates>
+  <triggers>
+    <trigger>
+      <uuid>496bd3232fcd428bb85fa120228e542b</uuid>
+      <expression>nodata(/Template Canon iR2520 SNMP/sys.uptime,5m)=1</expression>
+      <name>Canon iR2520 SNMP unavailable</name>
+      <priority>HIGH</priority>
+      <manual_close>YES</manual_close>
+    </trigger>
+    <trigger>
+      <uuid>f36d7e81fa244dfc82fb8d08c34b539a</uuid>
+      <expression>find(/Template Canon iR2520 SNMP/printer.error.state,2m,"iregexp","door")=1</expression>
+      <name>Canon iR2520 DOOR / COVER OPEN</name>
+      <priority>HIGH</priority>
+      <manual_close>YES</manual_close>
+    </trigger>
+    <trigger>
+      <uuid>7ab9cafe9840462cb217b01642d9c7e5</uuid>
+      <expression>length(last(/Template Canon iR2520 SNMP/printer.error.state))&gt;0</expression>
+      <name>Canon iR2520 Printer Error</name>
+      <priority>WARNING</priority>
+      <manual_close>YES</manual_close>
+    </trigger>
+    <trigger>
+      <uuid>5c4aa14db9664e41b0f2131990fcce7b</uuid>
+      <expression>change(/Template Canon iR2520 SNMP/canon.pages.lifetime)&lt;0</expression>
+      <name>Canon iR2520 Lifetime Counter Decreased</name>
+      <priority>WARNING</priority>
+      <manual_close>YES</manual_close>
+    </trigger>
+    <trigger>
+      <uuid>4e57cec5e96c40959172e7241a54e0b0</uuid>
+      <expression>change(/Template Canon iR2520 SNMP/sys.uptime)&lt;0</expression>
+      <name>Canon iR2520 Reboot Detected</name>
+      <priority>INFO</priority>
+      <manual_close>YES</manual_close>
+    </trigger>
+    <trigger>
+      <uuid>a6801e3409a444918f1a7e095cb887e8</uuid>
+      <expression>max(/Template Canon iR2520 SNMP/icmpping,#3)=0</expression>
+      <name>Canon iR2520 not reachable by ping</name>
+      <priority>HIGH</priority>
+      <manual_close>YES</manual_close>
+    </trigger>
+  </triggers>
+</zabbix_export>
