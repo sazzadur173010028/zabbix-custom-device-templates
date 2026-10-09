@@ -279,8 +279,5 @@ Never include passwords, API credentials, or other sensitive information in issu
 
 ## License
 
-No license has been assigned to this project yet. Until a license is added, the repository's contents are not automatically licensed for redistribution or modification.
-
-If you intend to publish the template as an open-source resource, add a `LICENSE` file with the license you choose.
-
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
