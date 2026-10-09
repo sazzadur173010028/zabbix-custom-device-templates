@@ -1,46 +1,90 @@
-# Canon LBP243dw II — Zabbix SNMP Template
+# Canon i-SENSYS LBP242 II / LBP243 II — Zabbix Template
 
-## Overview
+A custom Zabbix 7.4 template for monitoring Canon i-SENSYS LBP242 II and LBP243 II printers using SNMPv1.
 
-A custom Zabbix template for monitoring the Canon LBP243dw II printer through SNMP.
+The template covers printer identity, availability, device status, toner information, page counters, Ethernet statistics, and firmware information.
 
-## Device
+## Template Information
 
-* **Manufacturer:** Canon
-* **Model:** LBP243dw II
-* **Monitoring Protocol:** SNMP
-* **Validation:** Tested on the corresponding device model
+| Property         | Value                                |
+| ---------------- | ------------------------------------ |
+| Template file    | `canon-lbp242ii-243ii-snmp.xml`      |
+| Supported models | Canon i-SENSYS LBP242 II / LBP243 II |
+| Protocol         | SNMPv1                               |
+| Zabbix version   | 7.4                                  |
+| Validation       | Tested template                      |
+
+## Monitoring Features
+
+* Printer model, serial number, and location.
+* Device uptime.
+* Printer status and error state.
+* Ethernet operational status and speed.
+* Ethernet traffic, errors, and discards.
+* Black toner description and reported level.
+* Lifetime page counter.
+* Canon private counters.
+* Firmware version information.
+* ICMP ping availability.
+
+## Triggers
+
+* SNMP unavailable.
+* ICMP ping failure.
+* Toner warning between 10% and 20%.
+* High toner alert below 10%.
+
+Toner alerts depend on the values reported by the printer and the configured preprocessing.
 
 ## Requirements
 
-* Network connectivity between Zabbix and the printer
-* SNMP enabled on the printer
-* Compatible SNMP configuration and permissions
-* A compatible Zabbix server
+* Zabbix Server or Proxy 7.4.
+* SNMPv1 enabled on the printer.
+* Network connectivity between the printer and Zabbix.
+* `snmpwalk`, `snmpget`, and `fping` available on the monitoring server where required.
 
 ## Installation
 
-1. Download `template.xml` from this directory.
-2. Open Zabbix → Data collection → Templates.
-3. Select Import and upload the XML file.
-4. Review and complete the import.
-5. Configure the required host interface and macros.
-6. Link the template to the target printer host.
-7. Verify the collected data in Latest data.
+1. Open **Data collection → Templates → Import**.
+2. Import `canon-lbp242ii-243ii-snmp.xml`.
+3. Create a host for the printer.
+4. Add an SNMP interface using the printer's IP address.
+5. Select SNMPv1 and configure the appropriate community.
+6. Link this template to the host.
+7. Check **Monitoring → Latest data** to review the collected values.
 
-## Monitoring Details
+Configure the host interface community consistently with the `{$SNMP_COMMUNITY}` macro.
 
-See the imported template's actual items, triggers, and discovery rules for the supported metrics.
+## Technical Notes
 
-## Screenshots
+### Printer-MIB consumables
 
-Screenshots demonstrating the template and its collected data can be added to the `screenshots/` directory.
+The toner and lifetime-counter items use Printer-MIB table indexing. The following command can be used to inspect raw consumable values when troubleshooting:
+
+```bash
+snmpwalk -v1 -c 'YOUR_SNMP_COMMUNITY' PRINTER_IP 1.3.6.1.2.1.43.11.1
+```
+
+Replace the example community and IP with your actual values. Confirm the returned table indices if an item reports an unexpected value.
+
+### Ethernet monitoring
+
+Ethernet items depend on the interface information exposed by the printer. If an item returns no data on a particular firmware version, inspect the relevant OID and item error before adjusting the configuration.
+
+### Toner thresholds
+
+The configured thresholds are intended to warn between 10% and 20% and raise a higher-severity alert below 10%. Confirm the returned units and preprocessing when reviewing toner values.
 
 ## Security
 
-Do not share SNMP community strings, credentials, or sensitive network information.
+* Avoid using the default SNMP community `public` in production.
+* Restrict SNMP access to trusted monitoring systems.
+* Never publish credentials or sensitive network information.
 
-## Notes
+## License
 
-This template was developed with AI assistance and validated through hands-on testing on the corresponding device model.
+This project is licensed under the MIT License. See the repository's [LICENSE](../../LICENSE) file for details.
 
+## Disclaimer
+
+Provided as-is. Monitoring results depend on the OIDs and values exposed by the printer firmware.
