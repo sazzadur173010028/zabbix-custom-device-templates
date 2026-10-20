@@ -1,0 +1,551 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: 5f2978b8bce24e3f8c1e8d2df37475fc
+      name: 'Templates/Network devices'
+  templates:
+    - uuid: 5c38a10235444d73bcb0c6f20efbac98
+      template: 'Hikvision NVR DS-9664NI-M8 ISAPI'
+      name: 'Hikvision NVR DS-9664NI-M8 ISAPI'
+      description: |
+        Hikvision NVR DS-9664NI-M8 monitoring via ISAPI (HTTP agent, Digest auth).
+        Set macros {$NVR.IP}, {$NVR.USER} and {$NVR.PASSWORD} on the host.
+      groups:
+        - name: 'Templates/Network devices'
+      items:
+        - uuid: c0229cf88afe47d1bc529b225453ea0b
+          name: 'ICMP ping'
+          type: SIMPLE
+          key: 'icmpping[{$NVR.IP}]'
+          history: 7d
+          valuemap:
+            name: 'Service state'
+          triggers:
+            - uuid: 902e102af5604a61ae358cf17245a4eb
+              expression: 'max(/Hikvision NVR DS-9664NI-M8 ISAPI/icmpping[{$NVR.IP}],#3)=0'
+              name: 'NVR {HOST.NAME} ping kaj korche na'
+              priority: DISASTER
+        - uuid: c0706e4daad043308815b0e8c08c52d4
+          name: 'Storage: raw data'
+          type: HTTP_AGENT
+          key: hik.storage.raw
+          delay: 5m
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          url: '{$NVR.SCHEME}://{$NVR.IP}:{$NVR.PORT}/ISAPI/ContentMgmt/Storage'
+          authtype: DIGEST
+          username: '{$NVR.USER}'
+          password: '{$NVR.PASSWORD}'
+          timeout: 15s
+          status_codes: '200'
+          preprocessing:
+            - type: XML_TO_JSON
+              parameters:
+                - ''
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var d = JSON.parse(value);
+                  var l = d.storage ? d.storage.hddList : undefined;
+                  if (l && typeof l === 'object' && l.hdd !== undefined && !Array.isArray(l.hdd)) { l.hdd = [l.hdd]; }
+                  return JSON.stringify(d);
+          tags:
+            - tag: component
+              value: raw
+          triggers:
+            - uuid: 96058ded05094cda9ac6365eea7e44a9
+              expression: 'nodata(/Hikvision NVR DS-9664NI-M8 ISAPI/hik.storage.raw,15m)=1'
+              name: 'NVR {HOST.NAME}: ISAPI data pawa jachhe na (login/network check korun)'
+              priority: HIGH
+        - uuid: 8308beb3cf3f4172a2cb6a4a2612ede1
+          name: 'Channels: raw data'
+          type: HTTP_AGENT
+          key: hik.channels.raw
+          delay: 1m
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          url: '{$NVR.SCHEME}://{$NVR.IP}:{$NVR.PORT}/ISAPI/ContentMgmt/InputProxy/channels/status'
+          authtype: DIGEST
+          username: '{$NVR.USER}'
+          password: '{$NVR.PASSWORD}'
+          timeout: 20s
+          status_codes: '200'
+          preprocessing:
+            - type: XML_TO_JSON
+              parameters:
+                - ''
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var d = JSON.parse(value);
+                  var l = d.InputProxyChannelStatusList;
+                  if (l && typeof l === 'object' && l.InputProxyChannelStatus !== undefined && !Array.isArray(l.InputProxyChannelStatus)) { l.InputProxyChannelStatus = [l.InputProxyChannelStatus]; }
+                  return JSON.stringify(d);
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 8c50d6c63ade473eb57e2ef31d61a0ac
+          name: 'Device info: raw data'
+          type: HTTP_AGENT
+          key: hik.deviceinfo.raw
+          delay: 1h
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          url: '{$NVR.SCHEME}://{$NVR.IP}:{$NVR.PORT}/ISAPI/System/deviceInfo'
+          authtype: DIGEST
+          username: '{$NVR.USER}'
+          password: '{$NVR.PASSWORD}'
+          timeout: 15s
+          status_codes: '200'
+          preprocessing:
+            - type: XML_TO_JSON
+              parameters:
+                - ''
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 31d519bf78184a3ca09c6e86b8b74eeb
+          name: 'System status: raw data'
+          type: HTTP_AGENT
+          key: hik.status.raw
+          delay: 1m
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          url: '{$NVR.SCHEME}://{$NVR.IP}:{$NVR.PORT}/ISAPI/System/status'
+          authtype: DIGEST
+          username: '{$NVR.USER}'
+          password: '{$NVR.PASSWORD}'
+          timeout: 15s
+          status_codes: '200'
+          preprocessing:
+            - type: XML_TO_JSON
+              parameters:
+                - ''
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 3bbbdc6dfe4e4b73a8eff72550e245f1
+          name: 'Model'
+          type: DEPENDENT
+          key: hik.model
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.DeviceInfo.model
+          master_item:
+            key: hik.deviceinfo.raw
+          tags:
+            - tag: component
+              value: system
+        - uuid: fddc48c456d24489bc9df62f8f9dd2ab
+          name: 'Serial number'
+          type: DEPENDENT
+          key: hik.serial
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.DeviceInfo.serialNumber
+          master_item:
+            key: hik.deviceinfo.raw
+          tags:
+            - tag: component
+              value: system
+        - uuid: dc71530a2ce64e20b4e7110dc66e43d0
+          name: 'Firmware version'
+          type: DEPENDENT
+          key: hik.firmware
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.DeviceInfo.firmwareVersion
+          master_item:
+            key: hik.deviceinfo.raw
+          tags:
+            - tag: component
+              value: system
+        - uuid: aeaf998723c64c078cfb71b37652d022
+          name: 'Memory used'
+          type: DEPENDENT
+          key: hik.mem.used
+          delay: '0'
+          value_type: FLOAT
+          units: B
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var d = JSON.parse(value).DeviceStatus;
+                  var m = d && d.MemoryList ? d.MemoryList.Memory : undefined;
+                  if (m === undefined || m === null) { throw 'Memory data not found'; }
+                  if (!Array.isArray(m)) { m = [m]; }
+                  var sum = 0, n = 0;
+                  m.forEach(function (x) {
+                    var v = parseFloat(String(x.memoryUsage).replace(/\s+/g, ''));
+                    if (!isNaN(v)) { sum += v; n++; }
+                  });
+                  if (n === 0) { throw 'memoryUsage not found'; }
+                  return sum;
+            - type: MULTIPLIER
+              parameters:
+                - '1048576'
+          master_item:
+            key: hik.status.raw
+          tags:
+            - tag: component
+              value: system
+        - uuid: be1eff0c12824d0baae6f67fc0939988
+          name: 'Uptime'
+          type: DEPENDENT
+          key: hik.uptime
+          delay: '0'
+          value_type: FLOAT
+          units: uptime
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var d = JSON.parse(value).DeviceStatus;
+                  var u = d ? (d.deviceUpTime !== undefined ? d.deviceUpTime : d.deviceUptime) : undefined;
+                  if (u === undefined || u === null) { throw 'uptime not found'; }
+                  var v = parseFloat(String(u).replace(/\s+/g, ''));
+                  if (isNaN(v)) { throw 'uptime is not a number'; }
+                  return v;
+          master_item:
+            key: hik.status.raw
+          tags:
+            - tag: component
+              value: system
+        - uuid: c05183b3d95744eeac438015dc6771ef
+          name: 'HDD: installed count'
+          type: DEPENDENT
+          key: hik.hdd.count
+          delay: '0'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var d = JSON.parse(value);
+                  var h = d.storage.hddList.hdd;
+                  if (!Array.isArray(h)) { h = [h]; }
+                  var n = 0;
+                  h.forEach(function (x) { if (x.status !== 'notexist') { n++; } });
+                  return n;
+          master_item:
+            key: hik.storage.raw
+          tags:
+            - tag: component
+              value: storage
+          triggers:
+            - uuid: 25f79bfb21f947048e83686439c40661
+              expression: 'last(/Hikvision NVR DS-9664NI-M8 ISAPI/hik.hdd.count)<{$NVR.HDD.MIN}'
+              name: 'NVR {HOST.NAME}: HDD sonkha kome gechhe (ache {ITEM.LASTVALUE}, dorkar {$NVR.HDD.MIN})'
+              priority: HIGH
+        - uuid: 603e2b205918496faf7cdace832fb259
+          name: 'Channels: total'
+          type: DEPENDENT
+          key: hik.ch.total
+          delay: '0'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var d = JSON.parse(value);
+                  var c = d.InputProxyChannelStatusList.InputProxyChannelStatus;
+                  if (!Array.isArray(c)) { c = [c]; }
+                  return c.length;
+          master_item:
+            key: hik.channels.raw
+          tags:
+            - tag: component
+              value: channels
+        - uuid: 9c8f8ab9d9e74523aac4a7f6ddf6ed7d
+          name: 'Channels: online'
+          type: DEPENDENT
+          key: hik.ch.online.count
+          delay: '0'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var d = JSON.parse(value);
+                  var c = d.InputProxyChannelStatusList.InputProxyChannelStatus;
+                  if (!Array.isArray(c)) { c = [c]; }
+                  var n = 0;
+                  c.forEach(function (x) { if (x.online === 'true') { n++; } });
+                  return n;
+          master_item:
+            key: hik.channels.raw
+          tags:
+            - tag: component
+              value: channels
+        - uuid: 8fcb7100a9db4ceea50b5632527bbb90
+          name: 'Channels: offline'
+          type: DEPENDENT
+          key: hik.ch.offline.count
+          delay: '0'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var d = JSON.parse(value);
+                  var c = d.InputProxyChannelStatusList.InputProxyChannelStatus;
+                  if (!Array.isArray(c)) { c = [c]; }
+                  var n = 0;
+                  c.forEach(function (x) { if (x.online !== 'true') { n++; } });
+                  return n;
+          master_item:
+            key: hik.channels.raw
+          tags:
+            - tag: component
+              value: channels
+          triggers:
+            - uuid: 99a32d3675244832afb606a11a8caaf4
+              expression: 'min(/Hikvision NVR DS-9664NI-M8 ISAPI/hik.ch.offline.count,#3)>0'
+              name: 'NVR {HOST.NAME}: {ITEM.LASTVALUE} ti camera offline'
+              opdata: 'Offline: {?last(/Hikvision NVR DS-9664NI-M8 ISAPI/hik.ch.offline.list)}'
+              priority: AVERAGE
+        - uuid: 22769e3e06534a09986b4ad3f5e5b79e
+          name: 'Channels: offline IP list'
+          type: DEPENDENT
+          key: hik.ch.offline.list
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var d = JSON.parse(value);
+                  var c = d.InputProxyChannelStatusList.InputProxyChannelStatus;
+                  if (!Array.isArray(c)) { c = [c]; }
+                  var out = [];
+                  c.forEach(function (x) {
+                    if (x.online !== 'true') {
+                      out.push('CH' + x.id + '=' + x.sourceInputPortDescriptor.ipAddress);
+                    }
+                  });
+                  return out.length ? out.join(', ') : 'none';
+          master_item:
+            key: hik.channels.raw
+          tags:
+            - tag: component
+              value: channels
+      discovery_rules:
+        - uuid: 144fbb65bf134cc38f471a7cdaf8e579
+          name: 'HDD discovery'
+          type: DEPENDENT
+          key: hik.hdd.discovery
+          delay: '0'
+          lifetime: 7d
+          item_prototypes:
+            - uuid: 92cb52fe498e4425b71b9ad924f4f210
+              name: 'HDD {#HDD_NAME}: status'
+              type: DEPENDENT
+              key: 'hik.hdd.status[{#HDD_ID}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.storage.hddList.hdd[?(@.id==''{#HDD_ID}'')].status'
+                - type: REGEX
+                  parameters:
+                    - '^\["?(.*?)"?\]$'
+                    - \1
+              master_item:
+                key: hik.storage.raw
+              tags:
+                - tag: component
+                  value: storage
+              trigger_prototypes:
+                - uuid: 3c3b8fc676264cca9b936528aedd2c3e
+                  expression: 'last(/Hikvision NVR DS-9664NI-M8 ISAPI/hik.hdd.status[{#HDD_ID}])<>"ok"'
+                  name: 'NVR {HOST.NAME}: HDD {#HDD_NAME} problem (status: {ITEM.LASTVALUE})'
+                  priority: HIGH
+            - uuid: 843118656cff41c497f5308f7769b6a8
+              name: 'HDD {#HDD_NAME}: capacity'
+              type: DEPENDENT
+              key: 'hik.hdd.capacity[{#HDD_ID}]'
+              delay: '0'
+              value_type: FLOAT
+              units: B
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.storage.hddList.hdd[?(@.id==''{#HDD_ID}'')].capacity'
+                - type: REGEX
+                  parameters:
+                    - '^\["?(\d+)"?\]$'
+                    - \1
+                - type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+              master_item:
+                key: hik.storage.raw
+              tags:
+                - tag: component
+                  value: storage
+            - uuid: c11191c3799145f085638367ab783b69
+              name: 'HDD {#HDD_NAME}: free space'
+              type: DEPENDENT
+              key: 'hik.hdd.free[{#HDD_ID}]'
+              delay: '0'
+              value_type: FLOAT
+              units: B
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.storage.hddList.hdd[?(@.id==''{#HDD_ID}'')].freeSpace'
+                - type: REGEX
+                  parameters:
+                    - '^\["?(\d+)"?\]$'
+                    - \1
+                - type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+              master_item:
+                key: hik.storage.raw
+              tags:
+                - tag: component
+                  value: storage
+          master_item:
+            key: hik.storage.raw
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.storage.hddList.hdd
+          filter:
+            evaltype: AND_OR
+            conditions:
+              - macro: '{#HDD_STATUS}'
+                value: '^notexist$'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
+          lld_macro_paths:
+            - lld_macro: '{#HDD_ID}'
+              path: $.id
+            - lld_macro: '{#HDD_NAME}'
+              path: $.hddName
+            - lld_macro: '{#HDD_STATUS}'
+              path: $.status
+        - uuid: 891710cd9b134f7690137620c09723c5
+          name: 'Camera channel discovery'
+          type: DEPENDENT
+          key: hik.ch.discovery
+          delay: '0'
+          lifetime: 7d
+          item_prototypes:
+            - uuid: 0e2982de04ae40b9b76ad3c313031bdd
+              name: 'Channel {#CH_ID} ({#CH_IP}): online'
+              type: DEPENDENT
+              key: 'hik.ch.online[{#CH_ID}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.InputProxyChannelStatusList.InputProxyChannelStatus[?(@.id==''{#CH_ID}'')].online'
+                - type: JAVASCRIPT
+                  parameters:
+                    - 'return value.indexOf("true") >= 0 ? 1 : 0;'
+              master_item:
+                key: hik.channels.raw
+              tags:
+                - tag: component
+                  value: channels
+              trigger_prototypes:
+                - uuid: 25abf9dd0d8b47f89e98c04200c9f2e7
+                  expression: 'max(/Hikvision NVR DS-9664NI-M8 ISAPI/hik.ch.online[{#CH_ID}],#3)=0'
+                  name: 'NVR {HOST.NAME}: Camera CH{#CH_ID} ({#CH_IP}) offline'
+                  priority: WARNING
+            - uuid: f272b957ee73473cb7b4ebd9c0daf6b4
+              name: 'Channel {#CH_ID} ({#CH_IP}): detect result'
+              type: DEPENDENT
+              key: 'hik.ch.detect[{#CH_ID}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.InputProxyChannelStatusList.InputProxyChannelStatus[?(@.id==''{#CH_ID}'')].chanDetectResult'
+                - type: REGEX
+                  parameters:
+                    - '^\["?(.*?)"?\]$'
+                    - \1
+              master_item:
+                key: hik.channels.raw
+              tags:
+                - tag: component
+                  value: channels
+            - uuid: df9ee139c84f493ba1e1549c7b28e6fb
+              name: 'Channel {#CH_ID} ({#CH_IP}): password status'
+              type: DEPENDENT
+              key: 'hik.ch.pwd[{#CH_ID}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.InputProxyChannelStatusList.InputProxyChannelStatus[?(@.id==''{#CH_ID}'')].SecurityStatus.PasswordStatus'
+                - type: REGEX
+                  parameters:
+                    - '^\["?(.*?)"?\]$'
+                    - \1
+              master_item:
+                key: hik.channels.raw
+              tags:
+                - tag: component
+                  value: security
+              trigger_prototypes:
+                - uuid: 2ae7b041f9294cbf932ee484fa9f9395
+                  expression: 'last(/Hikvision NVR DS-9664NI-M8 ISAPI/hik.ch.pwd[{#CH_ID}])="weak"'
+                  name: 'NVR {HOST.NAME}: Camera CH{#CH_ID} ({#CH_IP}) password weak'
+                  status: DISABLED
+                  priority: INFO
+          master_item:
+            key: hik.channels.raw
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.InputProxyChannelStatusList.InputProxyChannelStatus
+          lld_macro_paths:
+            - lld_macro: '{#CH_ID}'
+              path: $.id
+            - lld_macro: '{#CH_IP}'
+              path: $.sourceInputPortDescriptor.ipAddress
+      macros:
+        - macro: '{$NVR.IP}'
+          description: 'NVR IP address (host macro e set korun)'
+        - macro: '{$NVR.SCHEME}'
+          value: http
+        - macro: '{$NVR.PORT}'
+          value: '80'
+        - macro: '{$NVR.USER}'
+          value: admin
+        - macro: '{$NVR.PASSWORD}'
+          type: SECRET_TEXT
+        - macro: '{$NVR.HDD.MIN}'
+          value: '6'
+      valuemaps:
+        - uuid: 515baaf719714430aa97a948f3eecd04
+          name: 'Service state'
+          mappings:
+            - value: '0'
+              newvalue: Down
+            - value: '1'
+              newvalue: Up
