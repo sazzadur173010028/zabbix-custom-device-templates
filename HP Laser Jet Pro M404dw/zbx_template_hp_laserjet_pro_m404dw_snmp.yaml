@@ -1,0 +1,542 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+  - uuid: 5f2978b8bce24e3f8c1e8d2df37475fc
+    name: Templates/Network devices
+  templates:
+  - uuid: 6d3153ea0d5f427998ca7b3306d6b446
+    template: HP LaserJet Pro M404dw SNMP
+    name: HP LaserJet Pro M404dw SNMP
+    description: HP LaserJet Pro M404dw monitoring over SNMP v1/v2c. Toner level, toner replacement event, pages printed per cartridge, status, memory and eth0 traffic. Add an SNMP interface to the host.
+    groups:
+    - name: Templates/Network devices
+    items:
+    - uuid: 5e570c8e487945f49e9ae1e0537dc200
+      name: ICMP ping
+      type: SIMPLE
+      key: icmpping
+      history: 30d
+      valuemap:
+        name: Service state
+      tags:
+      - tag: component
+        value: availability
+      triggers:
+      - uuid: 1d2663f913154346a633abc2bb2a852c
+        expression: max(/HP LaserJet Pro M404dw SNMP/icmpping,#3)=0
+        name: Printer {HOST.NAME} ping kaj korche na
+        priority: AVERAGE
+    - uuid: 8657a2e18b0c487b853831828af74dd5
+      name: ICMP packet loss
+      type: SIMPLE
+      key: icmppingloss
+      value_type: FLOAT
+      units: '%'
+      history: 30d
+      tags:
+      - tag: component
+        value: availability
+      triggers:
+      - uuid: 8ae593c4791c406f8df2c04fbdc51693
+        expression: min(/HP LaserJet Pro M404dw SNMP/icmppingloss,5m)>{$HP.ICMP.LOSS.WARN}
+        name: 'Printer {HOST.NAME}: ping packet loss beshi ({ITEM.LASTVALUE})'
+        priority: WARNING
+    - uuid: 84f89559f09d437ab4f9538db999dc54
+      name: ICMP response time
+      type: SIMPLE
+      key: icmppingsec
+      value_type: FLOAT
+      units: s
+      history: 30d
+      tags:
+      - tag: component
+        value: availability
+    - uuid: d07d5a527c87445c89601289df035625
+      name: Device name
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.1.5.0
+      key: hp.sys.name
+      delay: 1h
+      history: 30d
+      value_type: CHAR
+      trends: '0'
+      tags:
+      - tag: component
+        value: general
+    - uuid: 75dbf3519dd240ffbebe5a29f9916316
+      name: Model
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.25.3.2.1.3.1
+      key: hp.model
+      delay: 1h
+      history: 30d
+      value_type: CHAR
+      trends: '0'
+      tags:
+      - tag: component
+        value: general
+    - uuid: 8735bb55a5704ecfab6b6e36d3b626c2
+      name: Serial number
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.43.5.1.1.17.1
+      key: hp.serial
+      delay: 1h
+      history: 30d
+      value_type: CHAR
+      trends: '0'
+      tags:
+      - tag: component
+        value: general
+    - uuid: a5871a78c292466d9127f187c99c7b04
+      name: Device uptime
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.25.1.1.0
+      key: hp.uptime
+      delay: 5m
+      history: 30d
+      value_type: FLOAT
+      units: uptime
+      preprocessing:
+      - type: MULTIPLIER
+        parameters:
+        - '0.01'
+      tags:
+      - tag: component
+        value: general
+      triggers:
+      - uuid: 062597ea5d904b83bd60ac7a6637b8fd
+        expression: last(/HP LaserJet Pro M404dw SNMP/hp.uptime)<600
+        name: Printer {HOST.NAME} reboot hoyeche (uptime {ITEM.LASTVALUE})
+        priority: INFO
+    - uuid: aa2eb233e9ef4c00b65ee21bb41d099f
+      name: SNMP agent uptime
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.1.3.0
+      key: hp.snmp.uptime
+      delay: 5m
+      history: 30d
+      value_type: FLOAT
+      units: uptime
+      preprocessing:
+      - type: MULTIPLIER
+        parameters:
+        - '0.01'
+      tags:
+      - tag: component
+        value: general
+    - uuid: 77bff645ad6a4dcda9db72da8688f060
+      name: Printer status
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.25.3.5.1.1.1
+      key: hp.status
+      delay: 1m
+      history: 30d
+      valuemap:
+        name: HOST-RESOURCES-MIB::hrPrinterStatus
+      tags:
+      - tag: component
+        value: status
+      triggers:
+      - uuid: 3436a7a7e9d248698af142cb6da3a4b6
+        expression: nodata(/HP LaserJet Pro M404dw SNMP/hp.status,15m)=1
+        name: 'Printer {HOST.NAME}: SNMP data pawa jachhe na'
+        priority: AVERAGE
+    - uuid: 2bd1ce575c144981b5cd67c9d4e62c47
+      name: Status text (HP)
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.4.1.11.2.3.9.1.1.3.0
+      key: hp.status.text
+      delay: 1m
+      history: 7d
+      value_type: CHAR
+      trends: '0'
+      tags:
+      - tag: component
+        value: status
+    - uuid: e7da6d5861a3446b9d28fc8dd742764f
+      name: Display message
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.43.16.5.1.2.1.1
+      key: hp.display
+      delay: 1m
+      history: 7d
+      value_type: CHAR
+      trends: '0'
+      tags:
+      - tag: component
+        value: status
+    - uuid: c904902c4a1849e2bac798bc1f7aef6d
+      name: Top cover status
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.43.6.1.1.3.1.1
+      key: hp.cover.top
+      delay: 1m
+      history: 30d
+      valuemap:
+        name: Printer-MIB::prtCoverStatus
+      tags:
+      - tag: component
+        value: status
+      triggers:
+      - uuid: 6d76f342e5f44d52998362badbd5ffeb
+        expression: last(/HP LaserJet Pro M404dw SNMP/hp.cover.top)=3 or last(/HP LaserJet Pro M404dw SNMP/hp.cover.top)=5
+        name: 'Printer {HOST.NAME}: top cover khola'
+        priority: WARNING
+    - uuid: 3aae50e6d3b74fd1a276c91b073ace3a
+      name: Toner description
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.43.11.1.1.6.1.1
+      key: hp.toner.desc
+      delay: 1h
+      history: 30d
+      value_type: CHAR
+      trends: '0'
+      tags:
+      - tag: component
+        value: toner
+    - uuid: e643574f9e084d9cbd513857ede69ed0
+      name: Toner cartridge model (HP)
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.4.1.11.2.3.9.4.2.1.4.1.10.1.1.1.1.0
+      key: hp.toner.model
+      delay: 1h
+      history: 30d
+      value_type: CHAR
+      trends: '0'
+      tags:
+      - tag: component
+        value: toner
+    - uuid: b016204aa32c45f8a4112030e92d255d
+      name: Toner cartridge ID (HP)
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.4.1.11.2.3.9.4.2.1.4.1.10.1.1.3.1.0
+      key: hp.toner.serial
+      delay: 1h
+      history: 30d
+      value_type: CHAR
+      trends: '0'
+      description: Cartridge identifier reported by the printer. Informational.
+      tags:
+      - tag: component
+        value: toner
+    - uuid: 776d6468c8384d258cbc37b813b4ec05
+      name: Toner max capacity
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.43.11.1.1.8.1.1
+      key: hp.toner.max
+      delay: 1h
+      history: 30d
+      value_type: FLOAT
+      tags:
+      - tag: component
+        value: toner
+    - uuid: 073903ef93764e4c8861b97bba8ada3d
+      name: Toner level
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.43.11.1.1.9.1.1
+      key: hp.toner.level
+      delay: 5m
+      history: 90d
+      value_type: FLOAT
+      units: '%'
+      description: 'Black toner level in percent. Printer-MIB special values: -2 unknown, -3 some remaining.'
+      tags:
+      - tag: component
+        value: toner
+      triggers:
+      - uuid: c0d0ce76023b4cae8362e9cfc9a7a39b
+        expression: last(/HP LaserJet Pro M404dw SNMP/hp.toner.level)>0 and last(/HP LaserJet Pro M404dw SNMP/hp.toner.level)<={$HP.TONER.LOW}
+        name: 'Printer {HOST.NAME}: toner kom ({ITEM.LASTVALUE})'
+        priority: WARNING
+        opdata: 'Toner level: {ITEM.LASTVALUE1}%'
+      - uuid: 790a5d6b581b42e7890433f43716eb9d
+        expression: last(/HP LaserJet Pro M404dw SNMP/hp.toner.level)=0
+        name: 'Printer {HOST.NAME}: toner shesh'
+        priority: HIGH
+      - uuid: 34977a096995483f83abd2de3c24c04f
+        expression: last(/HP LaserJet Pro M404dw SNMP/hp.toner.level)>last(/HP LaserJet Pro M404dw SNMP/hp.toner.level,#2)+{$HP.TONER.JUMP} and last(/HP LaserJet Pro M404dw SNMP/hp.toner.level,#2)>=0
+        name: Toner cartridge replaced (previous cartridge printed {?last(/HP LaserJet Pro M404dw SNMP/hp.pages.current_toner)} pages)
+        priority: INFO
+        recovery_mode: NONE
+        manual_close: 'YES'
+        description: Toner level jumped up, so a new cartridge was installed. The page count in the name is what the previous cartridge printed. Now set {$HP.TONER.BASE.PAGES} to the current Total pages value and close this problem.
+    - uuid: a8b34d1533d9488f9809a54757f25536
+      name: Toner used
+      type: CALCULATED
+      key: hp.toner.used
+      delay: 5m
+      value_type: FLOAT
+      params: 100-last(//hp.toner.level)
+      units: '%'
+      tags:
+      - tag: component
+        value: toner
+    - uuid: 91685aee316148de936f5b4575aff0c7
+      name: Total pages printed
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.43.10.2.1.4.1.1
+      key: hp.pages.total
+      delay: 5m
+      history: 90d
+      units: pages
+      description: Lifetime page counter (prtMarkerLifeCount).
+      tags:
+      - tag: component
+        value: pages
+    - uuid: e915a961496b477aa6dc5334b26832aa
+      name: Pages printed on current toner
+      type: CALCULATED
+      key: hp.pages.current_toner
+      delay: 5m
+      value_type: FLOAT
+      params: last(//hp.pages.total)-{$HP.TONER.BASE.PAGES}
+      units: pages
+      description: Total pages minus {$HP.TONER.BASE.PAGES}. Set that macro to the Total pages value when a new cartridge is installed.
+      tags:
+      - tag: component
+        value: pages
+    - uuid: b4b1da7029bd48e79ead5985c3f98e67
+      name: Pages printed (last 24h)
+      type: CALCULATED
+      key: hp.pages.24h
+      delay: 1h
+      value_type: FLOAT
+      params: last(//hp.pages.total)-first(//hp.pages.total,1d)
+      units: pages
+      tags:
+      - tag: component
+        value: pages
+    - uuid: 0a5cf3a9d3f943bda84115ddf645695b
+      name: Pages printed (last 30d)
+      type: CALCULATED
+      key: hp.pages.30d
+      delay: 1h
+      value_type: FLOAT
+      params: last(//hp.pages.total)-first(//hp.pages.total,30d)
+      units: pages
+      tags:
+      - tag: component
+        value: pages
+    - uuid: b74a5732cfe641cdac2959ef39c88ca4
+      name: Memory total
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.25.2.3.1.5.1
+      key: hp.mem.total
+      delay: 5m
+      history: 30d
+      units: B
+      description: hrStorageSize (allocation unit is 1 byte on this model).
+      tags:
+      - tag: component
+        value: memory
+    - uuid: 43c99090e54b49b38296c0be5b664f33
+      name: Memory used
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.25.2.3.1.6.1
+      key: hp.mem.used
+      delay: 5m
+      history: 30d
+      units: B
+      tags:
+      - tag: component
+        value: memory
+    - uuid: 7b16489a20704baf9c3bee0022669870
+      name: Memory utilization
+      type: CALCULATED
+      key: hp.mem.util
+      delay: 5m
+      value_type: FLOAT
+      params: last(//hp.mem.used)*100/last(//hp.mem.total)
+      units: '%'
+      tags:
+      - tag: component
+        value: memory
+      triggers:
+      - uuid: c071b537fa7744f3a561d3e8e5209111
+        expression: min(/HP LaserJet Pro M404dw SNMP/hp.mem.util,15m)>{$HP.MEM.MAX}
+        name: 'Printer {HOST.NAME}: memory usage beshi ({ITEM.LASTVALUE})'
+        priority: WARNING
+    - uuid: 99fef83525624e2081cd0b978fd1eb18
+      name: 'eth0: operational status'
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.2.2.1.8.2
+      key: hp.if.status
+      delay: 1m
+      history: 30d
+      valuemap:
+        name: IF-MIB::ifOperStatus
+      tags:
+      - tag: component
+        value: network
+      triggers:
+      - uuid: 302a676e3bf84f48a71fd54aa9abd8b5
+        expression: last(/HP LaserJet Pro M404dw SNMP/hp.if.status)<>1
+        name: 'Printer {HOST.NAME}: eth0 down'
+        priority: AVERAGE
+    - uuid: f08743db2f984e2ea0e07e93fb81e460
+      name: 'eth0: speed'
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.2.2.1.5.2
+      key: hp.if.speed
+      delay: 1h
+      history: 30d
+      units: bps
+      tags:
+      - tag: component
+        value: network
+    - uuid: fed0130f180b4dc99acf027ac9a4f123
+      name: 'eth0: bits received'
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.2.2.1.10.2
+      key: hp.if.in
+      delay: 1m
+      history: 30d
+      value_type: FLOAT
+      units: bps
+      preprocessing:
+      - type: CHANGE_PER_SECOND
+        parameters:
+        - ''
+      - type: MULTIPLIER
+        parameters:
+        - '8'
+      tags:
+      - tag: component
+        value: network
+    - uuid: 4c18968769c5441d92d4f13398ffebc6
+      name: 'eth0: bits sent'
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.2.2.1.16.2
+      key: hp.if.out
+      delay: 1m
+      history: 30d
+      value_type: FLOAT
+      units: bps
+      preprocessing:
+      - type: CHANGE_PER_SECOND
+        parameters:
+        - ''
+      - type: MULTIPLIER
+        parameters:
+        - '8'
+      tags:
+      - tag: component
+        value: network
+    - uuid: ba2ebd9519fb4b048d1a37c24d228744
+      name: 'eth0: inbound errors'
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.2.2.1.14.2
+      key: hp.if.in.errors
+      delay: 5m
+      history: 30d
+      value_type: FLOAT
+      units: pps
+      preprocessing:
+      - type: CHANGE_PER_SECOND
+        parameters:
+        - ''
+      tags:
+      - tag: component
+        value: network
+    - uuid: 7679a20e0dd64dd48473439a8423e6ac
+      name: 'eth0: outbound errors'
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.2.2.1.20.2
+      key: hp.if.out.errors
+      delay: 5m
+      history: 30d
+      value_type: FLOAT
+      units: pps
+      preprocessing:
+      - type: CHANGE_PER_SECOND
+        parameters:
+        - ''
+      tags:
+      - tag: component
+        value: network
+    - uuid: feaad92bf9e04e569e9e1692a4e828ca
+      name: 'eth0: inbound discards'
+      type: SNMP_AGENT
+      snmp_oid: 1.3.6.1.2.1.2.2.1.13.2
+      key: hp.if.in.discards
+      delay: 5m
+      history: 30d
+      value_type: FLOAT
+      units: pps
+      preprocessing:
+      - type: CHANGE_PER_SECOND
+        parameters:
+        - ''
+      tags:
+      - tag: component
+        value: network
+    macros:
+    - macro: '{$SNMP_COMMUNITY}'
+      value: public
+      description: SNMP v1/v2c community of the printer.
+    - macro: '{$HP.TONER.LOW}'
+      value: '10'
+      description: Toner low warning threshold, in percent.
+    - macro: '{$HP.TONER.JUMP}'
+      value: '20'
+      description: Toner level increase (in percent points) treated as a cartridge replacement.
+    - macro: '{$HP.TONER.BASE.PAGES}'
+      value: '0'
+      description: Total pages printed counter value when the current toner cartridge was installed.
+    - macro: '{$HP.MEM.MAX}'
+      value: '95'
+      description: Memory utilization threshold, in percent.
+    - macro: '{$HP.ICMP.LOSS.WARN}'
+      value: '20'
+      description: ICMP packet loss threshold, in percent.
+    valuemaps:
+    - uuid: df36afcc84894ad1b2b5ae994524abf1
+      name: Service state
+      mappings:
+      - value: '0'
+        newvalue: Down
+      - value: '1'
+        newvalue: Up
+    - uuid: d7d45cbe33e64f15b99ebb4a210c3baf
+      name: HOST-RESOURCES-MIB::hrPrinterStatus
+      mappings:
+      - value: '1'
+        newvalue: other
+      - value: '2'
+        newvalue: unknown
+      - value: '3'
+        newvalue: idle
+      - value: '4'
+        newvalue: printing
+      - value: '5'
+        newvalue: warmup
+    - uuid: 21413d3a05f84f35b81c4bdb599724f1
+      name: Printer-MIB::prtCoverStatus
+      mappings:
+      - value: '1'
+        newvalue: other
+      - value: '3'
+        newvalue: doorOpen
+      - value: '4'
+        newvalue: doorClosed
+      - value: '5'
+        newvalue: interlockOpen
+      - value: '6'
+        newvalue: interlockClosed
+    - uuid: d2d108f5e1744bfc9cbd68cea15fcb20
+      name: IF-MIB::ifOperStatus
+      mappings:
+      - value: '1'
+        newvalue: up
+      - value: '2'
+        newvalue: down
+      - value: '3'
+        newvalue: testing
+      - value: '4'
+        newvalue: unknown
+      - value: '5'
+        newvalue: dormant
+      - value: '6'
+        newvalue: notPresent
+      - value: '7'
+        newvalue: lowerLayerDown
