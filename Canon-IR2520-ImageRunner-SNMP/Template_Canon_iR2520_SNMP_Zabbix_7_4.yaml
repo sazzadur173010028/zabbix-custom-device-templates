@@ -1,0 +1,244 @@
+zabbix_export:
+  version: '7.4'
+  template_groups:
+    - uuid: bd122165ed754292977c6a02ae83b229
+      name: Templates/Printers
+  templates:
+    - uuid: 9892058f53324df1a41bdcae09517d8a
+      template: 'Template Canon iR2520 SNMP'
+      name: 'Template Canon iR2520 SNMP'
+      groups:
+        - name: Templates/Printers
+      items:
+        - uuid: d07e860d5207460fa283b54e77686213
+          name: 'SNMP Contact'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.1602.1.2.2.1.0
+          key: canon.contact
+          delay: 1h
+          history: 7d
+          value_type: CHAR
+        - uuid: 721d6573305b46da8019140579eee806
+          name: 'Copy B/W Large'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.1602.1.11.1.3.1.4.112
+          key: canon.counter.copy.bw
+          delay: 5m
+          history: 7d
+          units: pages
+        - uuid: 5b9311505bc940ad88b894273fedff00
+          name: 'Copy B/W Small'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.1602.1.11.1.3.1.4.113
+          key: canon.counter.copy.bw.small
+          delay: 5m
+          history: 7d
+          units: pages
+        - uuid: 864de658218f478c8223e76a5eb0d5a7
+          name: 'Copy Total'
+          type: CALCULATED
+          key: canon.counter.copy.total
+          delay: 5m
+          history: 7d
+          units: pages
+          params: last(//canon.counter.copy.bw)+last(//canon.counter.copy.bw.small)
+        - uuid: 29c8d8c204d5494aac2f7956679332af
+          name: 'Print Total'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.1602.1.11.1.3.1.4.301
+          key: canon.counter.print.total
+          delay: 5m
+          history: 7d
+          units: pages
+        - uuid: fd5c3fe42e8c4aa581706ca9bd2b33aa
+          name: 'Scan Total'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.1602.1.11.1.3.1.4.501
+          key: canon.counter.scan.total
+          delay: 5m
+          history: 7d
+          units: pages
+        - uuid: 09dab411b7e745859c7a8a929af19510
+          name: 'SNMP Location'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.1602.1.2.2.3.0
+          key: canon.location
+          delay: 1h
+          history: 7d
+          value_type: CHAR
+        - uuid: 11f6038d11e14c29b5c755df2d4328e3
+          name: 'Canon Model'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.1602.1.1.1.1.0
+          key: canon.model
+          delay: 1h
+          history: 7d
+          value_type: CHAR
+        - uuid: 0a526861addc4a0f9394d0507f632ff8
+          name: 'Canon Model Name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.1602.1.1.1.2.0
+          key: canon.model.name
+          delay: 1h
+          history: 7d
+          value_type: CHAR
+        - uuid: 8ac0c43e043c4be4b44757074ce5b385
+          name: 'Pages Printed on Drum Counter'
+          type: CALCULATED
+          key: canon.pages.current_drum
+          delay: 5m
+          value_type: FLOAT
+          units: pages
+          params: 'last(//canon.pages.lifetime)-{$CANON.DRUM.BASE.PAGES}'
+          description: canon.pages.lifetime
+        - uuid: 31a4919dc4f7455e8473d58e36727af5
+          name: 'Lifetime Page Counter'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.43.10.2.1.4.1.1
+          key: canon.pages.lifetime
+          delay: 5m
+          history: 7d
+          units: pages
+          triggers:
+            - uuid: 5c4aa14db9664e41b0f2131990fcce7b
+              expression: 'change(/Template Canon iR2520 SNMP/canon.pages.lifetime)<0'
+              name: 'Canon iR2520 Lifetime Counter Decreased'
+              priority: WARNING
+              manual_close: 'YES'
+        - uuid: 5dc89deb66124eee9a98ee5ada7bcf28
+          name: 'Canon Serial Number'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.1602.1.2.1.4.0
+          key: canon.serial
+          delay: 1h
+          history: 7d
+          value_type: CHAR
+        - uuid: 6e3928331add40f888430ed3a8b1fb90
+          name: 'Canon Enterprise Status 1.12.1.0'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.1602.1.12.1.0
+          key: canon.status.1.12
+          history: 7d
+        - uuid: be4803a233774dc2bd07f209dd288713
+          name: 'Tray 1 Paper Level'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.43.8.2.1.10.1.2
+          key: canon.tray1.level
+          delay: 5m
+          history: 7d
+          value_type: FLOAT
+        - uuid: 6e1bc04c358d4a6b999ccddaa26dd107
+          name: 'ICMP Ping'
+          type: SIMPLE
+          key: icmpping
+          history: 7d
+          triggers:
+            - uuid: a6801e3409a444918f1a7e095cb887e8
+              expression: 'max(/Template Canon iR2520 SNMP/icmpping,#3)=0'
+              name: 'Canon iR2520 not reachable by ping'
+              priority: HIGH
+              manual_close: 'YES'
+        - uuid: 20c20b39a0e24ad4ba479141c9fc729b
+          name: 'Ethernet Speed'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.2.2.1.5.1
+          key: 'if.speed[1]'
+          delay: 5m
+          history: 7d
+          units: bps
+        - uuid: c25a98d45d194d4b8313ccfcaa4b9346
+          name: 'Printer Error / Door State'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.3.5.1.2.1
+          key: printer.error.state
+          history: 7d
+          value_type: CHAR
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var h = value.replace(/[^0-9a-fA-F]/g, '');
+                  if (h.length < 2) { return ''; }
+                  var b1 = parseInt(h.substr(0, 2), 16);
+                  var b2 = (h.length >= 4) ? parseInt(h.substr(2, 2), 16) : 0;
+                  var f = [];
+                  if (b1 & 0x80) f.push('lowPaper');
+                  if (b1 & 0x40) f.push('noPaper');
+                  if (b1 & 0x20) f.push('lowToner');
+                  if (b1 & 0x10) f.push('noToner');
+                  if (b1 & 0x08) f.push('doorOpen');
+                  if (b1 & 0x04) f.push('jammed');
+                  if (b1 & 0x02) f.push('offline');
+                  if (b1 & 0x01) f.push('serviceRequested');
+                  if (b2 & 0x80) f.push('inputTrayMissing');
+                  if (b2 & 0x40) f.push('outputTrayMissing');
+                  if (b2 & 0x20) f.push('markerSupplyMissing');
+                  if (b2 & 0x10) f.push('outputNearFull');
+                  if (b2 & 0x08) f.push('outputFull');
+                  if (b2 & 0x04) f.push('inputTrayEmpty');
+                  if (b2 & 0x02) f.push('overduePreventMaintenance');
+                  return f.join(', ');
+          triggers:
+            - uuid: f36d7e81fa244dfc82fb8d08c34b539a
+              expression: 'find(/Template Canon iR2520 SNMP/printer.error.state,2m,"iregexp","door")=1'
+              name: 'Canon iR2520 DOOR / COVER OPEN'
+              priority: HIGH
+              manual_close: 'YES'
+            - uuid: 7ab9cafe9840462cb217b01642d9c7e5
+              expression: 'length(last(/Template Canon iR2520 SNMP/printer.error.state))>0'
+              name: 'Canon iR2520 Printer Error'
+              priority: WARNING
+              manual_close: 'YES'
+        - uuid: 54063957c2cf4e8387e9d64a475efeac
+          name: 'Printer Status'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.3.5.1.1.1
+          key: printer.status
+          history: 7d
+        - uuid: fbc46315be184006a2ee7449503d987f
+          name: 'SNMP Name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.5.0
+          key: sys.name
+          delay: 1h
+          history: 7d
+          value_type: CHAR
+        - uuid: 2c4e13d0fc044387b22b8322e8527094
+          name: 'SNMP Uptime'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: sys.uptime
+          history: 7d
+          value_type: FLOAT
+          units: uptime
+          preprocessing:
+            - type: MULTIPLIER
+              parameters:
+                - '0.01'
+          triggers:
+            - uuid: 4e57cec5e96c40959172e7241a54e0b0
+              expression: 'change(/Template Canon iR2520 SNMP/sys.uptime)<0'
+              name: 'Canon iR2520 Reboot Detected'
+              priority: INFO
+              manual_close: 'YES'
+            - uuid: 496bd3232fcd428bb85fa120228e542b
+              expression: 'nodata(/Template Canon iR2520 SNMP/sys.uptime,5m)=1'
+              name: 'Canon iR2520 SNMP unavailable'
+              priority: HIGH
+              manual_close: 'YES'
+      tags:
+        - tag: class
+          value: printer
+        - tag: model
+          value: iR2520
+        - tag: snmp_version
+          value: v1
+        - tag: vendor
+          value: Canon
+      macros:
+        - macro: '{$CANON.DRUM.BASE.PAGES}'
+          value: '0'
+          description: 'Pages Printed Drum Counter'
+        - macro: '{$SNMP_COMMUNITY}'
+          value: public
+          description: 'SNMP v1 community. Host er SNMP interface e community field e {$SNMP_COMMUNITY} deben.'
