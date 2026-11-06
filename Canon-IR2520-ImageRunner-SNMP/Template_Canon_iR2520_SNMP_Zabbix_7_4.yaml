@@ -82,15 +82,55 @@ zabbix_export:
           delay: 1h
           history: 7d
           value_type: CHAR
+        - uuid: 4078c4a374c141d7becc240b7c5d1234
+          name: 'Pages printed (last 24h)'
+          type: CALCULATED
+          key: canon.pages.24h
+          delay: 1h
+          history: 7d
+          value_type: FLOAT
+          trends: 90d
+          units: pages
+          params: 'last(//canon.pages.lifetime)-first(//canon.pages.lifetime,1d)'
+        - uuid: 874669088f6b4d08b89ea393ad2e486e
+          name: 'Pages printed (last 30d)'
+          type: CALCULATED
+          key: canon.pages.30d
+          delay: 1h
+          value_type: FLOAT
+          units: pages
+          params: 'last(//canon.pages.lifetime)-first(//canon.pages.lifetime,30d)'
         - uuid: 8ac0c43e043c4be4b44757074ce5b385
           name: 'Pages Printed on Drum Counter'
           type: CALCULATED
           key: canon.pages.current_drum
           delay: 5m
+          history: 7d
           value_type: FLOAT
+          trends: 90d
           units: pages
           params: 'last(//canon.pages.lifetime)-{$CANON.DRUM.BASE.PAGES}'
           description: canon.pages.lifetime
+        - uuid: 8c7970beed0949e09d43524af0805e90
+          name: 'Pages printed on current toner'
+          type: CALCULATED
+          key: canon.pages.current_toner
+          delay: 5m
+          history: 7d
+          value_type: FLOAT
+          trends: 90d
+          units: pages
+          params: 'last(//canon.pages.lifetime)-{$CANON.TONER.BASE.PAGES}'
+          triggers:
+            - uuid: 601d4caaa525453fb2253c9fad675f36
+              expression: 'last(/Template Canon iR2520 SNMP/canon.pages.current_toner)=0'
+              name: 'Printer {HOST.NAME}: Toner Empty'
+              priority: HIGH
+            - uuid: 7e999ecae65e43f68f57dd54733cf35f
+              expression: 'last(/Template Canon iR2520 SNMP/canon.pages.current_toner)>0 and last(/Template Canon iR2520 SNMP/canon.pages.current_toner)<={$CANON.TONER.LOW}'
+              name: 'Printer {HOST.NAME}: Toner Low ({ITEM.LASTVALUE})'
+              opdata: 'Toner level: {ITEM.LASTVALUE1}%'
+              priority: WARNING
         - uuid: 31a4919dc4f7455e8473d58e36727af5
           name: 'Lifetime Page Counter'
           type: SNMP_AGENT
@@ -119,6 +159,25 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.1602.1.12.1.0
           key: canon.status.1.12
           history: 7d
+        - uuid: ef6ca070f48443ad8bef4fa933f681fb
+          name: 'Toner max capacity'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.43.11.1.1.8.1.1
+          key: canon.toner.max
+          delay: 5m
+          history: 7d
+          trends: 90d
+          units: '%'
+        - uuid: 78f13859a037485db7e72814b0a8bfd5
+          name: 'Toner used'
+          type: CALCULATED
+          key: canon.toner.used
+          delay: 5m
+          history: 7d
+          value_type: FLOAT
+          trends: 90d
+          units: '%'
+          params: 100-last(//printer.toner.black.level)
         - uuid: be4803a233774dc2bd07f209dd288713
           name: 'Tray 1 Paper Level'
           type: SNMP_AGENT
@@ -195,6 +254,20 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.25.3.5.1.1.1
           key: printer.status
           history: 7d
+        - uuid: c1208c6bc329443f8d8dac322d3bcec2
+          name: 'Toner level'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.43.11.1.1.9.1.1
+          key: printer.toner.black.level
+          delay: 5m
+          history: 7d
+          trends: 90d
+          units: '%'
+          triggers:
+            - uuid: 9cd5047cccba49339161ccacb9c65d22
+              expression: 'last(/Template Canon iR2520 SNMP/printer.toner.black.level)>last(/Template Canon iR2520 SNMP/printer.toner.black.level,#2)+{$CANON.TONER.JUMP} and last(/Template Canon iR2520 SNMP/printer.toner.black.level,#2)>=0'
+              name: 'Toner cartridge replaced (previous cartridge printed {?last(/Template Canon iR2520 SNMP/canon.pages.current_toner)} pages)'
+              priority: INFO
         - uuid: fbc46315be184006a2ee7449503d987f
           name: 'SNMP Name'
           type: SNMP_AGENT
@@ -236,9 +309,15 @@ zabbix_export:
         - tag: vendor
           value: Canon
       macros:
+        - macro: '{$CANON.TONER.BASE.PAGES}'
+          value: '0'
+          description: 'Pages Printed Counter'
         - macro: '{$CANON.DRUM.BASE.PAGES}'
           value: '0'
           description: 'Pages Printed Drum Counter'
+        - macro: '{$CANON.TONER.JUMP}'
+          value: '20'
+          description: 'Toner level increase (in percent points) treated as a cartridge replacement.'
         - macro: '{$SNMP_COMMUNITY}'
           value: public
           description: 'SNMP v1 community. Host er SNMP interface e community field e {$SNMP_COMMUNITY} deben.'
